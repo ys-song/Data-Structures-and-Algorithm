@@ -1,0 +1,50 @@
+#### 题目：用两个栈实现队列（来源：剑指offer）
+****
+用两个栈实现一个队列。队列的声明如下，请实现它的两个函数 appendTail 和 deleteHead ，分别完成在队列尾部插入整数和在队列头部删除整数的功能。
+
+**解题思路**：根据题目要求，我们需要用两个栈实现一个队列的功能，栈是先入后出的结构，而队列是先入先出的结构。要解决这个问题，我们一般可以通过具体的例子来找出规律。例如，有两个栈分别为stack1和stack2，
+待操作的数据为1，2，3，4，5。
+* (a)假设我们开始先插入前三个数据 1，2，3，我们暂时将其插入到stack1中，此时stack1中的数据能保证各个数字的插入顺序。
+* (b)如果此时我们需要从中删除元素，根据队列先入先出的特性，那
+么此时我们必须先删除1，而1在stack1的底部，因此我们必须将stack1中元素的顺序反转过来，此时stack2就可以起作用了，我们可以先将stack1中的顶部元素弹出然后压入到stack2中，对1，2，3依次采取这种操作直至
+stack1为空，那么stack2中元素弹出的顺序刚好为队列的删除顺序，此时从stack2中弹出顶部元素就可以实现删除元素1。因此我们需要插入元素的时候只需向stack1中压入元素，而删除元素则只需从stack2中弹出元素。
+* (c)我们再插入4和5时，则只需按顺序依次压入stack1。
+* (d)再删除元素时，我们从stack2的顶部弹出元素即可。
+* (e)当2，3依次被弹出时，继续弹出元素我们会发现此时stack2为空，此时我们需要将stack1中的元素按照之前的步骤移到stack2中，然后再从stack2的顶部弹出元素。
+
+为了语义的清晰，我们可以将stack1和stack2分别命名为input和output。
+
+<img src="../../pictures/用两个栈实现队列.png" height="50%" width="50%" align="center">
+
+**实现过程**
+* **插入元素**：直接向栈input插入元素
+* **删除元素**：可以直接从output的顶部弹出元素，此时若output为空，需要查看栈input中是否有元素，如果有我们可以将input的顶部元素弹出然后再压入output中直至input为空，然后再从stack2的顶部弹出元素即可，
+如果没有可以返回-1表示没有删除的元素
+```
+class CQueue {
+    LinkedList<Integer> intput;
+    LinkedList<Integer> output;
+
+    public CQueue() {
+        intput = new LinkedList<>();
+        output = new LinkedList<>();
+    }
+    
+    public void appendTail(int value) {
+        intput.push(value);
+    }
+    
+    public int deleteHead() {
+        int res = -1;
+        if (output.isEmpty()) {
+            while (!intput.isEmpty()) {
+                output.push(intput.pop());
+            }
+            res = output.isEmpty() ? -1 : output.pop();
+        } else {
+            res = output.pop();
+        }
+        return res;
+    }
+}
+```
